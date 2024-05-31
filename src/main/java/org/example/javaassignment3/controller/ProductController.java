@@ -3,6 +3,7 @@ package org.example.javaassignment3.controller;
 import jakarta.validation.Valid;
 import org.example.javaassignment3.dto.ProductDTO;
 import org.example.javaassignment3.entity.Product;
+import org.example.javaassignment3.exception.ProductNotFoundException;
 import org.example.javaassignment3.repository.ProductRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,8 +20,6 @@ import java.util.Objects;
 @RequestMapping("products")
 public class ProductController {
 
-    private final Logger logger = LoggerFactory.getLogger(ProductController.class);
-
     @Autowired
     private ProductRepository productRepository;
 
@@ -28,8 +27,6 @@ public class ProductController {
     public ResponseEntity<List<Product>> retrieveAllProducts() {
         try {
             List<Product> products = productRepository.findAll();
-
-            logger.info("Daftar product: " + products);
 
             return new ResponseEntity<>(products, HttpStatus.OK);
         } catch (Exception e) {
@@ -55,6 +52,10 @@ public class ProductController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteProduct(@PathVariable Long id) {
+        if (!productRepository.existsById(id)) {
+            throw new ProductNotFoundException("Product tidak ditemukan dengan id: " + id);
+        }
+
         try {
             productRepository.deleteById(id);
             return new ResponseEntity<>("delete sukses", HttpStatus.OK);
