@@ -5,8 +5,6 @@ import org.example.javaassignment3.dto.ProductDTO;
 import org.example.javaassignment3.entity.Product;
 import org.example.javaassignment3.exception.ProductNotFoundException;
 import org.example.javaassignment3.repository.ProductRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +12,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Objects;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("products")
@@ -64,5 +62,21 @@ public class ProductController {
         }
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<Product> getProduct(@PathVariable Long id) {
+        if (!productRepository.existsById(id)) {
+            throw new ProductNotFoundException("Product tidak ditemukan dengan id: " + id);
+        }
+
+        try {
+            Optional<Product> product = productRepository.findById(id);
+            if (product.isEmpty()) {
+                throw new ProductNotFoundException("Product tidak ditemukan dengan id: " + id);
+            }
+            return new ResponseEntity<>(product.get(), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
 }
