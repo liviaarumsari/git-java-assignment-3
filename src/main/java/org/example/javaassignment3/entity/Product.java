@@ -21,6 +21,14 @@ public class Product {
     @Column
     private BigDecimal hargaJual;
 
+    public Product() {}
+
+    public Product(String nama, BigDecimal hargaBeli, BigDecimal hargaJual) {
+        this.nama = nama;
+        this.hargaBeli = hargaBeli;
+        this.hargaJual = hargaJual;
+    }
+
     public Long getId() {
         return id;
     }
